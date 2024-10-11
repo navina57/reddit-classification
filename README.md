@@ -1,205 +1,120 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project 3: Web APIs & NLP
+## Problem Statement 
 
-### Description
+The aim of this project is to develop a classification model that is able to accurately distinguish between two types of users based on their Reddit posts: users who are experienced investors (professionals) and users who are interested in finance but are not heavily investing yet (amateurs). 
 
-In week five we've learned about a few different classifiers. In week six we'll learn about webscraping, APIs, and Natural Language Processing (NLP). This project will put those skills to the test.
+This model will analyze posts from r/investing, where more advanced discussions around investing occurs and r/personalfinance which entails a wider array of topics, often focused on personal financial management and introductory-level investment advice. 
 
-For project 3, your goal is two-fold:
-1. Using Reddit's API, you'll collect posts from two subreddits of your choosing.
-2. You'll then use various NLP techniques to process your data before training a range of classifiers to determine where a given post came from.
+**How does this apply to the real world?**
 
+For fintech companies, being able to effectively target novice investors can lead to more efficient marketing strategies. Companies often face the challenge of identifying and targeting novice investors, who represent an untapped customer base, without wasting resources on experienced investors who may already have established investment patterns. By identifying and focusing on users who are new to investing but still interested in expanding their finances, companies can tailor educational content, products, and services specifically to meet the needs of this group. For example, they could offer simplified investment platforms, beginner investment plans, or educational materials to convert finance enthusiasts into active investors.
 
-#### About the API
+## Model Training and Evaluation
 
-In 2023, Reddit proposed and underwent a series of changes to its API that greatly affected the ways that users, developers, and academics interact with and access the troves of data that its community freely creates.
+### Logistic Regression Model, CountVectorizer
 
-While the cost of data storage cannot be ignored, the monetization of its API has led to a shutdown of massively popular third-party and stifled [important research](https://arxiv.org/search/?query=reddit&searchtype=all&source=header) in the social sciences (community formation/network analysis, hate speech, discourse analysis, etc.), cybersecurity (bot detection), and—importantly for us this week—the very large and diverse world of natural language processing (semantic analysis, translation, topic modeling, disambiguation, relationship extraction, etc).
+> This is my baseline model. Logistic Regression is a simple, interpretable model that acts as a benchmark before diving into more complex models. In this case, the Logistic Regression model performed fairly well with CountVectorizer. This model acheived high accuracy, precision and recall making it a great starting point to compare the rest of our models to.
 
-While APIs like Pushshift that collected and stored Reddit's data from its inception are no longer accessible, we can still retrieve a limited amount of data directly from [Reddit's API](https://www.reddit.com/dev/api/). As with anytime you begin interacting with a new tool, you should familiarize yourself as much as possible with the documentation.
+#### Findings 
+* **Precision**: 0.86
+> * This means that 86% of the times the model predicted r/personalfinance, it was correct. Because precision is high, we can assume that we have low false positives. This means that the model does not incorrectly label too many r/investing posts as r/personalfinance.
+* **Recall**: 0.89
+> * This means that the model identified 89% of the actual r/personalfinance posts correctly. False negatives are low because recall is high. The model is correctly identifying most of the r/personalfinance posts.
+* **F-1 Score**: 0.87
+> * This is the balance between precision and recall.
+* **Overall Accuracy**: 0.84
 
-**We will do a walkthrough of how to access and submit a simple request to the Reddit API together.**
+### Logistic Regression Model, TfidfVectorizer
 
----
-## Checkpoints and Advice
+> TF-IDF Vectorizer puts more emphasis on less frequent, unique terms in documents. This allows the model to better capture the distingushing features of each subreddit.
 
-If you aren't familiar with [reddit](https://www.reddit.com/), go check it out and browse different subreddits. Each subreddit is like a forum on a different topic. [Here's a list of subreddits by topic.](https://www.reddit.com/r/ListOfSubreddits/wiki/listofsubreddits)
+#### Findings 
+* **Precision**: 0.86
+> * This means that 86% of the times the model predicted r/personalfinance, it was correct. Because precision is high, we can assume that we have low false positives. This means that the model does not incorrectly label too many r/investing posts as r/personalfinance.
+* **Recall**: 0.91 (Higher than CountVectorizer)
+> * This means that the model identified 91% of the actual r/personalfinance posts correctly. False negatives are low because recall is high. The model is correctly identifying most of the r/personalfinance posts. One thing to note, the recall for r/investing decreased to 77%. 
+* **F-1 Score**: 0.88
+> * This is the balance between precision and recall.
+* **Overall Accuracy**: 0.85
+> * Compared to the baseline model, TfidfVectorizer slightly improves the accuracy from 0.84 to 0.85. This suggests that TF-IDF is capturing more relevant features than the word counts from CountVectorizer. 
 
-Data Choices
-- In your project you can classify posts, comments, titles, or some combination of those things. What you choose will partly determine how difficult your data cleaning will be and how challenging the classification task will be for your algorithms. In your presentation and executive summary, **tell us what you used**.
-- You can also include other information from posts or comments as features, but you must include some text.
+### Logistic Regression Model, CountVectorizer with Custom Vocabulary Parameter
 
-Subreddit Selection
-- The more similar the subreddits are, the more challenging (and interesting?!) your project will become.
-- Choose your subreddits as soon as you can and let us know your choices.  Consider the breakdown of the post count for each as well.
+> While preprocessing my text data, I noticed that there were several words that were unique to each subreddit. I thought that maybe my model would improve if the vocabulary paramter was hand-picked based on this. I went ahead and fit my Logistic Regression model using a CountVectorizer and my own vocabulary parameter. The custom vocabulary ultimately **did not** improve the model's performance over the baseline model. From this, we can assume that the manually defined vocabulary may not capture meaningful features compared to vocabulary automatically chosen by the vectorizer. There can be several reason for these drawbacks. By limiting the vocabulary, the model may be missing out on other relevant words that may provide nuance. Another drawback to this model may be that it is easier to inject personal bias. This results in essential terms being ignored. Custom vocabulary also poses flexibilty issues. The model may not generalize well across different or updated datasets leading to poor future performance. By hand selecting the vocabulary, the model risks becoming an oversimplified model that may not be able to capture patterns in the data or becoming too specific and overfit. Finally, creating this model manually helped me understand how tedious the process of parsing through data to find key words to add to the vocabulary would be. Despite these drawbacks, the model surprisingly did not perform worse. However, the model's performance did not improve either. This suggests that the manually defined vocabulary parameter may not be able to capture enough nuance to improve the model's performance.
 
-Data collection
-- You should have a script written to retrieve data from your subreddits of choice as soon as possible. Because the API only allows us to retrieve 1000 of the most recent new and popular posts at time, this script should be written so that you can execute it from the command line at regular intervals.
-- The more data you can pull the better for your classifier. **Ideally you will want data from at least 3000 unique, non-null posts from each subreddit.**
+#### Findings 
+* **Precision**: 0.86
+> * This means that 86% of the times the model predicted r/personalfinance, it was correct. Because precision is high, we can assume that we have low false positives. This means that the model does not incorrectly label too many r/investing posts as r/personalfinance.
+* **Recall**: 0.89
+> * This means that the model identified 89% of the actual r/personalfinance posts correctly. False negatives are low because recall is high. The model is correctly identifying most of the r/personalfinance posts.
+* **F-1 Score**: 0.87
+> * This is the balanced score between precision and recall.
+* **Overall Accuracy**: 0.84
 
+### Logistic Regression Model, TfidfVectorizer with Custom Vocabulary Parameter
 
----
+> As mentioned above, using custom vocabulary has multiple drawbacks. When they are not well-researched or there is not enough data to capture relevant terms effectively, they can harm a model's performance. 
 
-### Requirements
+#### Findings 
+* **Precision**: 0.70
+> * There is a significant drop in accuracy from 85% in the baseline model to 70%. 
+* **Recall**: 0.95
+> * While the recall for r/personalfinance was 95%, the recall for r/investing was a mere 40%. This suggests that many r/investing posts are misclassified as r/personalfinance. This suggests a high number of False Negatives for r/investing which significantly decreased performance. 
+* **F-1 Score**: 0.81
+> * The imbalance between r/investing scores and r/personalfinance scores suggests that the model is overfitting to r/personalfinance and failing to identify r/investing correctly. 
+* **Overall Accuracy**: 0.73
 
-- Gather and prepare your data using the `requests` library in a Python script.
-- Script suggestions:
-    - First time it runs:
-        - Gets user input on subreddits they want to collect information from
-        - Asks user for their API credentials
-        - Stores this information in a JSON file
-    - Submits requests to API until maximum number of posts have been retrieved
-    - Writes/appends post data to a singular file
-    - Creates and updates a transaction log recording the number of posts retrieved per script execution, the datetime of its execution, and the total number of posts retrieved to date
-        - This would ensure that the script was executed over several days' time
-    - Other considerations
-        - Added functionality to drop data you are confident you will not want for EDA or modeling
-        - Added functionality to drop duplicate posts from each successful round of API requests
-        - *Advanced bonus*: schedule a process for the script to be run automatically at regular intervals to avoid having to do it manually
-- **Create and compare at least two models**. These can be any classifier of your choosing: logistic regression, Naive Bayes, KNN, Random Forest Classifier, etc.
-  - **Bonus**: use a Naive Bayes classifier
-- Try to **build a robust commit history** on GHE for this project.
-- A Jupyter Notebook with your analysis for a **peer audience of data scientists.**
-- An executive summary of your results.
-- A short presentation outlining your process and findings for a semi-technical audience, shoot for **8 minutes**.
+### Naive Bayes Model, CountVectorizer
 
-**Pro Tip:** You can find a good example executive summary [here](https://www.proposify.biz/blog/executive-summary).
+> Naive Bayes generally works well with text data. This is seen especially when words are independent of one another because the model automatically assumes that features are not dependent. CountVectorizer captures word frequencies well for this model which contributes to the improved results. 
 
----
+#### Findings 
+* **Precision**: 0.87
+> * Naive Bayes seems to be performing on par with Logistic Regression + TfidfVectorizer. The precision for r/personalfinance is slighty higher. 
+* **Recall**: 0.88
+> * This means that the model identified 88% of the actual r/personalfinance posts correctly. False negatives are low because recall is high. Recall for r/investing is also higher with 81% which suggests that this model is performing better than the baseline in accurately identifying r/investing posts. Fewer false negatives are observed for r/investing as the model has improved from the baseline. 
+* **F-1 Score**: 0.88
+> * This is the balance between precision and recall.
+* **Overall Accuracy**: 0.85
 
-### Necessary Deliverables / Submission
+### Naive Bayes Model, TfidfVectorizer
 
-- Code and executive summary must be in a clearly commented Jupyter Notebook.
-- You must submit your slide deck.
-- Deadlines:
-    - **Materials submitted**: 12 noon ET/ 9 AM PT, Friday, October 11th
-    - **Presentation**: 12:30 PM ET/ 930 AM PT, Friday, October 11th
+> TF-IDF may not be able to capture word relevance as effectively for Naive Bayes in this dataset as it did for Logistic Regression. This may be due to the fact that Naive Bayes benefits more from raw frequency counts seen in CountVectorizer.
 
----
+#### Findings 
+* **Precision**: 0.83
+> * This means that 83% of the times the model predicted r/personalfinance, it was correct. Because precision is high, we can assume that we have low false positives. This means that the model does not incorrectly label too many r/investing posts as r/personalfinance.
+* **Recall**: 0.93
+> * While recall for r/personalfinance is 93% we see that recall for r/investing dropped to 72%. This means that the model faile to classify many r/investing posts. This results in a higher number of false negatives for r/investing. 
+* **F-1 Score**: 0.88
+> * This is the balance between precision and recall.
+* **Overall Accuracy**: 0.84
 
-## Rubric
-You should make sure that you consider and/or follow most if not all of the considerations/recommendations outlined below **while** working through your project.
+## Conclusion 
 
-For Project 3 the evaluation categories are as follows:<br>
-**The Data Science Process**
-- Problem Statement
-- Data Collection
-- Data Cleaning & EDA
-- Preprocessing & Modeling
-- Evaluation and Conceptual Understanding
-- Conclusion and Recommendations
+**Key Metrics**
+> * Precision: This measured how many of the posts predicted to be in a subreddit actually belonged to that subreddit. This was an important metric to note because false positives, in this case when r/investing posts are classified as r/personalfinance, are costly. This would mean the company would be marketing to professional investors when their target audience is novices.
+> * Recall: This measured how many of the actual posts from a subreddit were correctly identified. Having false negatives and missing r/personalfinance posts are detrimental because the company could be missing out on potential users.
+> * F1- Score: This gives an overall picture of the model's performance.
 
-**Organization and Professionalism**
-- Organization
-- Visualizations
-- Python Syntax and Control Flow
-- Presentation
+**Logistic Regression with TF-IDF**
+> * Best Score: 0.848
+> * Precision: 0.86
+> * Recall: 0.91
+> * F1-Score: 0.88
+> * This model has very high recall, meaning it is able to correctly identify 91% of the posts from r/personalfinance. It also has a strong precison of 86% meaning that a high percentage of posts classified as r/personalfinance are correct.
 
-**Scores will be out of 30 points based on the 10 categories in the rubric.** <br>
-*3 points per section*<br>
+**Naive Bayes with CountVectorizer**
+> * Best Score: 0.851
+> * Precision: 0.87
+> * Recall: 0.88
+> * F1-Score: 0.88
+> * This model has a slightly lower recall for r/personalfinance (from 0.91 to 0.88). The other metrics are fairly on par with the Logistic Regression model. This means that the model is still very good but it misses a few more r/personalfinance posts compared to the logistic model.
 
-| Score | Interpretation |
-| --- | --- |
-| **0** | *Project fails to meet the minimum requirements for this item.* |
-| **1** | *Project meets the minimum requirements for this item, but falls significantly short of portfolio-ready expectations.* |
-| **2** | *Project exceeds the minimum requirements for this item, but falls short of portfolio-ready expectations.* |
-| **3** | *Project meets or exceeds portfolio-ready expectations; demonstrates a thorough understanding of every outlined consideration.* |
+**FP vs FN**
+> * False Positives (FP): This occurs when the model is predicting a post is from r/personalfinance when it's actually from r/investing. Too many false positives could result in a company targeting users who may already be investors and would not find any benefit from the company's product.
+> * False Negatives (FN): This occurs when the model is predicting a post is from r/investing when it is actually from r/personalfinance. False negatives could result in a company missing potential users who are novices and may be interested in the company's product. This may be worse for the company in the long run.
 
+**Best Model**
 
-### The Data Science Process
-
-**Problem Statement**
-- Is it clear what the goal of the project is?
-- What type of model will be developed?
-- How will success be evaluated?
-- Is the scope of the project appropriate?
-- Is it clear who cares about this or why this is important to investigate?
-- Does the student consider the audience and the primary and secondary stakeholders?
-
-**Data Collection**
-- Was enough data gathered to generate a significant result?
-- Was data collected that was useful and relevant to the project?
-- Was data collection and storage optimized through custom functions, pipelines, and/or automation?
-- Was thought given to the server receiving the requests such as considering number of requests per second?
-
-**Data Cleaning and EDA**
-- Are missing values imputed/handled appropriately?
-- Are distributions examined and described?
-- Are outliers identified and addressed?
-- Are appropriate summary statistics provided?
-- Are steps taken during data cleaning and EDA framed appropriately?
-- Does the student address whether or not they are likely to be able to answer their problem statement with the provided data given what they've discovered during EDA?
-
-**Preprocessing and Modeling**
-- Is text data successfully converted to a matrix representation?
-- Are methods such as stop words, stemming, and lemmatization explored?
-- Does the student properly split and/or sample the data for validation/training purposes?
-- Does the student test and evaluate a variety of models to identify a production algorithm (**AT MINIMUM:** two classification models, **BONUS:** try a Naive Bayes)?
-- Does the student defend their choice of production model relevant to the data at hand and the problem?
-- Does the student explain how the model works and evaluate its performance successes/downfalls?
-
-**Evaluation and Conceptual Understanding**
-- Does the student accurately identify and explain the baseline score?
-- Does the student select and use metrics relevant to the problem objective?
-- Does the student interpret the results of their model for purposes of inference?
-- Is domain knowledge demonstrated when interpreting results?
-- Does the student provide appropriate interpretation with regards to descriptive and inferential statistics?
-
-**Conclusion and Recommendations**
-- Does the student provide appropriate context to connect individual steps back to the overall project?
-- Is it clear how the final recommendations were reached?
-- Are the conclusions/recommendations clearly stated?
-- Does the conclusion answer the original problem statement?
-- Does the student address how findings of this research can be applied for the benefit of stakeholders?
-- Are future steps to move the project forward identified?
-
-
-### Organization and Professionalism
-
-**Project Organization**
-- Are modules imported correctly (using appropriate aliases)?
-- Are data imported/saved using relative paths?
-- Does the README provide a good executive summary of the project?
-- Is markdown formatting used appropriately to structure notebooks?
-- Are there an appropriate amount of comments to support the code?
-- Are files & directories organized correctly?
-- Are there unnecessary files included?
-- Do files and directories have well-structured, appropriate, consistent names?
-- Is there a robust commit history?
-
-**Visualizations**
-- Are sufficient visualizations provided?
-- Do plots accurately demonstrate valid relationships?
-- Are plots labeled properly?
-- Are plots interpreted appropriately?
-- Are plots formatted and scaled appropriately for inclusion in a notebook-based technical report?
-
-**Python Syntax and Control Flow**
-- Is care taken to write human readable code?
-- Is the code syntactically correct (no runtime errors)?
-- Does the code generate desired results (logically correct)?
-- Does the code follows general best practices and style guidelines?
-- Are Pandas functions used appropriately?
-- Are `sklearn` and `NLTK` methods used appropriately?
-
-**Presentation**
-- Is the problem statement clearly presented?
-- Does a strong narrative run through the presentation building toward a final conclusion?
-- Are the conclusions/recommendations clearly stated?
-- Is the level of technicality appropriate for the intended audience?
-- Is the student substantially over or under time?
-- Does the student appropriately pace their presentation?
-- Does the student deliver their message with clarity and volume?
-- Are appropriate visualizations generated for the intended audience?
-- Are visualizations necessary and useful for supporting conclusions/explaining findings?
-
-
----
-
-### Why did we choose this project for you?
-This project covers three of the biggest concepts we cover in the class: Classification Modeling, Natural Language Processing and Data Wrangling/Acquisition.
-
-Part 1 of the project focuses on **Data wrangling/gathering/acquisition**. This is a very important skill as not all the data you will need will be in clean CSVs or a single table in SQL.  There is a good chance that wherever you land you will have to gather some data from some unstructured/semi-structured sources; when possible, requesting information from an API, but often scraping it because they don't have an API (or it's terribly documented).
-
-Part 2 of the project focuses on **Natural Language Processing** and converting standard text data (like Titles and Comments) into a format that allows us to analyze it and use it in modeling.
-
-Part 3 of the project focuses on **Classification Modeling**.  Given that project 2 was a regression focused problem, we needed to give you a classification focused problem to practice the various models, means of assessment and preprocessing associated with classification.   
+#### Logistic Regression with TF-IDF!! 
+This model has the highest recall for identifying posts from r/personalfinance. This means that a company that uses this model to scout for novices who are interested in investing will reach their target audience. It is the best choice because it prioritizes capturing as many r/personalfinance posts as possible (these are potential users). 
