@@ -47,33 +47,33 @@ This project investigates various machine learning models to determine which app
 - **Precision**: 86%
 - **Recall**: 89%
 - **F1-Score**: 87%
-🔹 **Findings**: Strong baseline model with balanced precision and recall.
+- **Findings**: Strong baseline model with balanced precision and recall.
 
 ### 2. Logistic Regression + TF-IDF (Best Model)
 - **Accuracy**: 85%
 - **Precision**: 86%
 - **Recall**: 91%
 - **F1-Score**: 88%
-🔹 **Findings**: TF-IDF captured more relevant features, improving recall and F1-score.
+- **Findings**: TF-IDF captured more relevant features, improving recall and F1-score.
 
 ### 3. Naïve Bayes + CountVectorizer
 - **Accuracy**: 85%
 - **Precision**: 87%
 - **Recall**: 88%
 - **F1-Score**: 88%
-🔹 **Findings**: Performs on par with Logistic Regression but benefits from word frequency-based features.
+- **Findings**: Performs on par with Logistic Regression but benefits from word frequency-based features.
 
 ### 4. Naïve Bayes + TF-IDF
 - **Accuracy**: 84%
 - **Precision**: 83%
 - **Recall**: 93%
 - **F1-Score**: 88%
-🔹 **Findings**: Higher recall but slightly lower precision than CountVectorizer.
+- **Findings**: Higher recall but slightly lower precision than CountVectorizer.
 
 ### 5. Logistic Regression + Custom Vocabulary (CountVectorizer & TF-IDF)
 - **Accuracy Drop**: 85% → 73%
 - **Recall for r/investing**: 40% (major drop)
-🔹 **Findings**: Custom vocabulary added bias, reducing generalization.
+- **Findings**: Custom vocabulary added bias, reducing generalization.
 
 ## Key Takeaways
 
@@ -85,14 +85,14 @@ This project investigates various machine learning models to determine which app
 ## Business Impact
 
 For fintech companies, leveraging this classification model can:
-- ✅ Optimize customer segmentation by identifying novice investors
-- ✅ Improve engagement through targeted educational content
-- ✅ Enhance conversion rates by guiding users toward suitable investment tools
+- Optimize customer segmentation by identifying novice investors
+- Improve engagement through targeted educational content
+- Enhance conversion rates by guiding users toward suitable investment tools
 
 Future improvements could include deep learning models (e.g., transformers) to capture richer contextual information in Reddit discussions.
 
 ## Next Steps
 
-🔹 Expand dataset by incorporating more Reddit subreddits related to investing.
-🔹 Implement deep learning models (e.g., BERT) to improve classification.
-🔹 Deploy a live model API for real-time subreddit classification.
+- Expand dataset by incorporating more Reddit subreddits related to investing.
+- Implement deep learning models (e.g., BERT) to improve classification.
+- Deploy a live model API for real-time subreddit classification.
